@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Subnet Planner</title>
+    <style id="style">
+        .edge {
+            background-color: blue;
+            position: absolute;
+            border-radius: 0px;
+        }
+
+        body {
+            font-family: Oxygen-Sans, sans-serif;
+            margin: 0px;
+            background-color: #112;
+            color: white;
+            font-weight: bold;
+        }
+
+        a #download_button {
+            font-family: Oxygen-Sans, sans-serif;
+            font-size: 16px;
+        }
+
+        div {
+            position: absolute;
+            justify-content: center;
+            align-items: center;
+        }
+
+        button {
+            position: absolute;
+        }
+
+        .selected {
+            box-shadow: 0px 0px 10px 2px yellow;
+        }
+
+        #canvas {
+            height: 800px;
+            width: 1250px;
+        }
+
+        #grid {
+            float: left;
+            width: 800px;
+            height: 800px;
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+            background-color: #111;
+            background-size: 50px 50px;
+            background-image: linear-gradient(#ccc 1px, transparent 1px), linear-gradient(90deg, #ccc 1px, transparent 1px);
+            background-position: -0.5px -0.5px;
+            box-shadow: 0px 0px 5px 3px white;
+            border-radius: 10px;
+        }
+
+        .square {
+            box-shadow: inset 0 0 5px white;
+            border: 1px solid white;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 40px;
+            line-height: 50px;
+            vertical-align: middle;
+            height: 50px;
+        }
+
+        .sq24 {
+            background-color: hsl(120, 50%, 25%);
+            font-size: 20px;
+            width: 50px;
+            line-height: 60px;
+        }
+
+        .sq23 {
+            background-color: hsl(110, 50%, 30%);
+            font-size: 30px;
+            width: 100px;
+            line-height: 55px;
+        }
+
+        .sq22 {
+            background-color: hsl(90, 50%, 35%);
+            width: 200px;
+        }
+
+        .sq21 {
+            background-color: hsl(50, 50%, 45%);
+            width: 400px;
+        }
+
+        .sq20 {
+            background-color: hsl(0, 50%, 50%);
+            width: 800px;
+        }
+
+        .sq19 {
+            background-color: hsl(-10, 50%, 50%);
+            height: 100px;
+            width: 800px;
+            line-height: 100px;
+        }
+
+        .sq18 {
+            background-color: hsl(-20, 50%, 50%);
+            height: 200px;
+            width: 800px;
+            line-height: 200px;
+        }
+
+        #table {
+            height: 800px;
+            width: 400px;
+            position: relative;
+            float: right;
+            margin-left: 25px;
+        }
+
+        #table .square {
+            position: absolute;
+            cursor: pointer;
+        }
+
+        #table .sq24 {
+            width: 50px;
+        }
+
+        #table .sq23 {
+            left: 75px;
+            width: 100px;
+        }
+
+        #table .sq22 {
+            left: 200px;
+            width: 200px;
+        }
+
+        #table .sq21 {
+            top: 50px;
+            width: 400px;
+        }
+
+        #table .sq20 {
+            height: 100px;
+            line-height: 100px;
+            width: 400px;
+            top: 100px;
+        }
+
+        #table .sq19 {
+            top: 200px;
+            width: 400px;
+            height: 200px;
+            line-height: 200px;
+        }
+
+        #table .sq18 {
+            height: 400px;
+            line-height: 400px;
+            width: 400px;
+            top: 400px;
+        }
+
+        .unselectable {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .addr {
+            position: relative;
+            height: 50px;
+            width: 50px;
+            font-size: 10px;
+            float: left;
+            line-height: 20px;
+            vertical-align: middle;
+            text-align: center;
+            color: white;
+            z-index: 100;
+            opacity: 0.5;
+        }
+
+        #download {
+            position: relative;
+            left: 1302px;
+            top: 550px;
+            width: 48;
+            height: 48;
+            cursor: pointer;
+        }
+
+        #trash {
+            position: relative;
+            left: 1295px;
+            top: 655px;
+            width: 48;
+            height: 48;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="margin-left: 50px;">
+        <h1>Subnet Calc</h1>
+        <form>
+            <label for="scaleselect"> One Block is: </label>
+            <select name="scaleselect" id="scaleselect">
+                <option value="/24">Class C Subnet (/24)</option>
+                <option value="/32">Single IP Address (/32)</option>
+            </select>
+        </form>
+        <div style="margin: 20px; margin-left: 0; margin-top: 50px;">
+            <div>
+                <div id="canvas">
+                    <div id="grid"></div>
+                    <div id="table"></div>
+                    <div id="blocks"></div>
+                </div>
+                <div id="download" onclick="alert()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                        class="bi bi-download" viewBox="0 0 16 16">
+                        <path
+                            d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                        <path
+                            d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                    </svg>
+                </div>
+                <div id="trash" onclick="reset()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor"
+                        class="bi bi-trash3" viewBox="0 0 16 16">
+                        <path
+                            d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        let canvas = document.getElementById("canvas")
+        let blocks = document.getElementById("blocks")
+        let grid = document.getElementById("grid")
+        let table = document.getElementById("table")
+        let occupancy = "0".repeat(256)
+        let mouse_move_timeout = null
+
+        function reset() {
+            let conf = confirm("Do you really want to reset the canvas?")
+            if (conf) {
+                occupancy = "0".repeat(256)
+                while (blocks.firstChild) {
+                    blocks.removeChild(blocks.lastChild)
+                }
+            }
+        }
+
+        function nextFit(num_class_c) {
+            let block_width = num_class_c
+
+            for (let i = 0; i < 256 / num_class_c; i++) {
+                let block_begins_at = block_width * i
+                let occ = occupancy.substring(block_begins_at, block_begins_at + block_width)
+                if (occ === "0".repeat(block_width))
+                    return block_begins_at
+                else
+                    continue
+            }
+            alert("No free space found!")
+            return false
+        }
+
+        function insertBlock(num_class_c, at) {
+            occupancy = occupancy.substring(0, at) + "1".repeat(num_class_c) + occupancy.substring(at + num_class_c, 256)
+        }
+
+        for (let i = 0; i <= 6; i++) {
+            let mask = [24, 23, 22, 21, 20, 19, 18][i] 
+            let num_class_c = 2 ** (24 - mask)
+
+            let square = document.createElement("div")
+            square.classList = `square sq${mask} unselectable`
+
+            square.innerHTML = `/${mask}`
+            table.appendChild(square)
+
+            square.onclick = function (e) {
+                let copy = square.cloneNode(true)
+                let at = nextFit(num_class_c)
+
+                if (at !== false) {
+                    insertBlock(num_class_c, at)
+                    copy.style.left = (at % 16) * 50 + "px"
+                    copy.style.top = Math.floor(at / 16) * 50 + "px"
+                    copy.setAttribute("block_begins_at", at)
+
+                    blocks.appendChild(copy)
+                }
+            }
+        }
+
+        // add subnet addresses to grid
+        for (let x = 0; x < 16; x++)
+            for (let y = 0; y < 16; y++) {
+                let addr = document.createElement("div")
+                addr.classList = `addr unselectable`
+                addr.innerHTML = `.${x * 16 + y}`
+                addr.style.top = y * 50 + " px"
+                addr.style.left = x * 50 + " px"
+                grid.appendChild(addr)
+            }
+    </script>
+
+</body>
+
+</html>
