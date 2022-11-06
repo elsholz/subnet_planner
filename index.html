@@ -12,16 +12,24 @@
         }
 
         body {
-            font-family: Oxygen-Sans, sans-serif;
+            /*font-family: Oxygen-Sans, sans-serif;*/
+            font-family: Oxygen Mono, monospace;
             margin: 0px;
             background-color: #112;
             color: white;
             font-weight: bold;
+            font-size: 16px;
         }
 
-        a #download_button {
-            font-family: Oxygen-Sans, sans-serif;
+        input,
+        select {
+            font-family: Oxygen Mono, monospace;
+            font-weight: bold;
             font-size: 16px;
+            height: 30px;
+            padding: 0;
+            margin: 0;
+            text-align: center;
         }
 
         div {
@@ -70,43 +78,43 @@
         }
 
         .sq24 {
-            background-color: hsl(120, 50%, 25%);
+            background-color: hsl(300, 100%, 20%);
             font-size: 20px;
             width: 50px;
             line-height: 60px;
         }
 
         .sq23 {
-            background-color: hsl(110, 50%, 30%);
+            background-color: hsl(250, 100%, 20%);
             font-size: 30px;
             width: 100px;
             line-height: 55px;
         }
 
         .sq22 {
-            background-color: hsl(90, 50%, 35%);
+            background-color: hsl(200, 100%, 20%);
             width: 200px;
         }
 
         .sq21 {
-            background-color: hsl(50, 50%, 45%);
+            background-color: hsl(150, 100%, 20%);
             width: 400px;
         }
 
         .sq20 {
-            background-color: hsl(0, 50%, 50%);
+            background-color: hsl(100, 100%, 20%);
             width: 800px;
         }
 
         .sq19 {
-            background-color: hsl(-10, 50%, 50%);
+            background-color: hsl(50, 100%, 20%);
             height: 100px;
             width: 800px;
             line-height: 100px;
         }
 
         .sq18 {
-            background-color: hsl(-20, 50%, 50%);
+            background-color: hsl(0, 100%, 20%);
             height: 200px;
             width: 800px;
             line-height: 200px;
@@ -175,6 +183,7 @@
         }
 
         .addr {
+            pointer-events: none;
             position: relative;
             height: 50px;
             width: 50px;
@@ -185,7 +194,6 @@
             text-align: center;
             color: white;
             z-index: 100;
-            opacity: 0.5;
         }
 
         #download {
@@ -197,13 +205,116 @@
             cursor: pointer;
         }
 
-        #trash {
+        #buttons {
             position: relative;
-            left: 1295px;
-            top: 655px;
-            width: 48;
-            height: 48;
+            float: right;
+        }
+
+        .cursorRemove {
+            cursor: not-allowed;
+        }
+
+        .cursorDrag {
+            cursor: move;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            margin-top: -9px;
+            margin-bottom: 9px;
+            position: absolute;
             cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #444;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #777;
+        }
+
+        input:checked+.slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        .error {
+            border: 2px solid red;
+            box-shadow: 0 0 10px 0px red;
+        }
+
+        .error:focus-visible {
+            border: 2px solid red;
+            box-shadow: 0 0 15px 5px red;
+        }
+
+        #datatextfield {
+            width: 1240px;
+            height: 500px;
+            resize: none;
+            background-color: #0007;
+            color: white;
+            position: relative;
+            margin-bottom: 50px;
+        }
+
+        #trash,
+        #addrvis {
+            position: relative;
+            display: inline;
+            cursor: pointer;
+            margin-left: 25px;
+        }
+
+        .framed:hover {
+            color: black;
+            background-color: white;
+        }
+
+        .framed {
+            border: 1px solid #fffa;
+            box-shadow: 0 0 3px 0px white;
+            border-radius: 15px;
+            width: 38px;
+            height: 38px;
+            padding: 7px;
+        }
+
+        #formatselect {
+            background-color: #0007;
+            color: white;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -212,47 +323,208 @@
     <div style="margin-left: 50px;">
         <h1>Subnet Calc</h1>
         <form>
-            <label for="scaleselect"> One Block is: </label>
-            <select name="scaleselect" id="scaleselect">
+            <label for="scaleselect"><strong style="font-size: large">One Block is:</strong></label>
+            <select name="scaleselect" id="scaleselect"
+                style="font-size: large; background-color: #0007; color: white; border-radius: 10px;"
+                onchange="changeBlockSize()">
                 <option value="/24">Class C Subnet (/24)</option>
                 <option value="/32">Single IP Address (/32)</option>
             </select>
+
+            <label for="networkinput"><strong style="font-size: large; margin-left: 25px;">Network:</strong></label>
+            <input name="networkinput" id="networkinput"
+                style="width: 150px; background-color: #0007; color: white; border-radius: 10px;" value="10.0.0.0"
+                onchange="changeNetwork()">
+            </input>
+            <span id="networkmask">
+                /16
+            </span>
         </form>
         <div style="margin: 20px; margin-left: 0; margin-top: 50px;">
-            <div>
-                <div id="canvas">
-                    <div id="grid"></div>
-                    <div id="table"></div>
-                    <div id="blocks"></div>
-                </div>
-                <div id="download" onclick="alert()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
-                        class="bi bi-download" viewBox="0 0 16 16">
-                        <path
-                            d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
-                        <path
-                            d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
-                    </svg>
-                </div>
-                <div id="trash" onclick="reset()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor"
-                        class="bi bi-trash3" viewBox="0 0 16 16">
-                        <path
-                            d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z" />
-                    </svg>
-                </div>
+            <div id="canvas">
+                <div id="grid"></div>
+                <div id="table"></div>
+                <div id="blocks"></div>
+                <form style="position: relative; margin-left: 10px; margin-right: 500px; margin-bottom: 10px;">
+                    <label for="formatselect">
+                        <h2 style="display: inline;">
+                            Input/ Output Data as:
+                        </h2>
+                    </label>
+                    <select name="formatselect" id="formatselect" onchange="outputData()">
+                        <option value="json">JSON</option>
+                        <!-- <option value="list">Simple Subnet List</option> -->
+                        <!-- <option value="csv">CSV</option> -->
+                        <!-- <option value="scsv">SCSV</option> -->
+                    </select>
+                    <div style="float:right; margin-right: -250px; margin-top: -6px; position:relative">
+                        <h3 style="display: inline; margin-top: 10px;">
+                            Display: Mask
+                        </h3>
+                        <label class="switch">
+                            <input type="checkbox" id="displaywhichtoggle" onchange="changeDisplayWhich()">
+                            <span class="slider round"></span>
+                        </label>
+                        <h3 style="display: inline; margin-top: 10px;">
+                            Description
+                        </h3>
+                    </div>
+                    <div id="buttons" style="margin-left: 70px; margin-top: -24px; margin-right:-575px">
+                        <div id="addrvis" onclick="toggleAddrVisibility()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="48" fill="currentColor"
+                                class="bi bi-123 framed" viewBox="0 0 16 16">
+                                <path
+                                    d="M2.873 11.297V4.142H1.699L0 5.379v1.137l1.64-1.18h.06v5.961h1.174Zm3.213-5.09v-.063c0-.618.44-1.169 1.196-1.169.676 0 1.174.44 1.174 1.106 0 .624-.42 1.101-.807 1.526L4.99 10.553v.744h4.78v-.99H6.643v-.069L8.41 8.252c.65-.724 1.237-1.332 1.237-2.27C9.646 4.849 8.723 4 7.308 4c-1.573 0-2.36 1.064-2.36 2.15v.057h1.138Zm6.559 1.883h.786c.823 0 1.374.481 1.379 1.179.01.707-.55 1.216-1.421 1.21-.77-.005-1.326-.419-1.379-.953h-1.095c.042 1.053.938 1.918 2.464 1.918 1.478 0 2.642-.839 2.62-2.144-.02-1.143-.922-1.651-1.551-1.714v-.063c.535-.09 1.347-.66 1.326-1.678-.026-1.053-.933-1.855-2.359-1.845-1.5.005-2.317.88-2.348 1.898h1.116c.032-.498.498-.944 1.206-.944.703 0 1.206.435 1.206 1.07.005.64-.504 1.106-1.2 1.106h-.75v.96Z" />
+                            </svg>
+                        </div>
+                        <div id="trash" onclick="reset()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                                class="bi bi-trash3 framed" viewBox="0 0 16 16">
+                                <path
+                                    d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <!--
+                    <div id="download" onclick="alert()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                            class="bi bi-download" viewBox="0 0 16 16">
+                            <path
+                                d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                            <path
+                                d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                        </svg>
+                    </div>
+                    -->
+                </form>
+                <textarea oninput="inputData()" id="datatextfield"></textarea>
             </div>
+
         </div>
     </div>
-
 
     <script>
         let canvas = document.getElementById("canvas")
         let blocks = document.getElementById("blocks")
         let grid = document.getElementById("grid")
         let table = document.getElementById("table")
+        let networkMask = document.getElementById("networkmask")
         let occupancy = "0".repeat(256)
         let mouse_move_timeout = null
+
+        const blockSizeSelect = document.getElementById("scaleselect")
+        const networkInput = document.getElementById("networkinput")
+        const fileFormatSelect = document.getElementById("formatselect")
+        const dataTextField = document.getElementById("datatextfield")
+        const displayWhichToggle = document.getElementById("displaywhichtoggle")
+
+        let network = networkInput.value
+        let subnets = {}
+
+        const blockSizeMapping = {
+            "/24": {
+                24: "/24",
+                23: "/23",
+                22: "/22",
+                21: "/21",
+                20: "/20",
+                19: "/19",
+                18: "/18",
+            },
+            "/32": {
+                24: "/32",
+                23: "/31",
+                22: "/30",
+                21: "/29",
+                20: "/28",
+                19: "/27",
+                18: "/26",
+            }
+        }
+
+        function inputData() {
+            let format = fileFormatSelect.value
+            try {
+                if (format === "json") {
+                    let output = {}
+                    let data = JSON.parse(dataTextField.value)
+                    console.log(data)
+                    for (let [k, v] of Object.entries(data)) {
+                        output[parseInt(k.split(".")[isClassC() ? 2 : 3])] = {
+                            mask: parseInt(v.mask.slice(1,)),
+                            description: v.description
+                        }
+                    }
+                    subnets = output
+
+                    renderBlocks()
+                }
+                unsetTextfieldError()
+                return
+            } catch (e) {
+                setTextfieldError()
+                console.log(e)
+                return
+            }
+            alert("This format is currently not supported for input.")
+        }
+
+        function getBlockDisplay(blk) {
+            if (displayWhichToggle.checked) {
+                let res = subnets[blk.getAttribute("block_begins_at")].description
+                return res
+            }
+            return getSlashNotation(subnets[blk.getAttribute("block_begins_at")].mask)
+        }
+
+        function toggleAddrVisibility() {
+            for (let addr of document.getElementsByClassName("addr")) {
+                let op = parseFloat(addr.style.opacity)
+                addr.style.opacity = op === 0 ? 1 : op == 0.5 ? 0 : 0.5
+            }
+        }
+
+        function changeDisplayWhich() {
+            let displayDescription = displayWhichToggle.checked === true
+            changeBlockSize()
+        }
+
+        function getSlashNotation(cidr) {
+            return blockSizeMapping[blockSizeSelect.value][cidr]
+        }
+
+        function setTextfieldError() {
+            if (!dataTextField.classList.contains("error"))
+                dataTextField.classList.toggle("error")
+        }
+        function unsetTextfieldError() {
+            if (dataTextField.classList.contains("error"))
+                dataTextField.classList.toggle("error")
+        }
+
+        function outputData() {
+            let format = fileFormatSelect.value
+            if (format === "json") {
+                let data = {}
+                for (let [k, v] of Object.entries(subnets)) {
+                    // data[networkBaseString + k + (isClassC() ? ".0" : "") + subnets[k].mask] = subnets[k].name || ""
+                    data[networkBaseString + k + (isClassC() ? ".0" : "")] = {
+                        mask: getSlashNotation(subnets[k].mask),
+                        description: subnets[k].description,
+                    }
+                }
+                dataTextField.value = JSON.stringify(data, false, 4)
+                unsetTextfieldError()
+                return
+            } else if (format === "csv") {
+
+            } else if (format === "scsv") {
+
+            }
+            alert(`Cannot ourput data in format "${format}", please choose another format.`)
+        }
+
+        outputData()
 
         function reset() {
             let conf = confirm("Do you really want to reset the canvas?")
@@ -261,50 +533,122 @@
                 while (blocks.firstChild) {
                     blocks.removeChild(blocks.lastChild)
                 }
+                subnets = {}
+                outputData()
             }
         }
 
-        function nextFit(num_class_c) {
-            let block_width = num_class_c
+        function blockFits(num_blocks) {
+            console.log("Num Blocks for fit:", num_blocks, occupancy.length)
+            let block_width = num_blocks
+            let fitsAt = new Array()
 
-            for (let i = 0; i < 256 / num_class_c; i++) {
+            for (let i = 0; i < 256 / num_blocks; i++) {
                 let block_begins_at = block_width * i
                 let occ = occupancy.substring(block_begins_at, block_begins_at + block_width)
                 if (occ === "0".repeat(block_width))
-                    return block_begins_at
+                    fitsAt.push(block_begins_at)
                 else
                     continue
             }
-            alert("No free space found!")
-            return false
+            return fitsAt
         }
 
-        function insertBlock(num_class_c, at) {
-            occupancy = occupancy.substring(0, at) + "1".repeat(num_class_c) + occupancy.substring(at + num_class_c, 256)
+        function insertBlock(num_blocks, at) {
+            occupancy = occupancy.substring(0, at) + "1".repeat(num_blocks) + occupancy.substring(at + num_blocks, 256)
+        }
+
+        function renderBlocks() {
+            blocks.innerHTML = ''
+            occupancy = "0".repeat(257)
+            for (let [at, v] of Object.entries(subnets)) {
+                at = parseInt(at)
+                let copy = templateBlocks[v.mask].cloneNode(true)
+                let num_blocks = 2 ** (24 - v.mask)
+                // console.log(at, v.mask, num_blocks)
+                insertBlock(num_blocks, at)
+                copy.style.left = (at % 16) * 50 + "px"
+                copy.style.top = Math.floor(at / 16) * 50 + "px"
+                copy.classList += " cursorDrag"
+                copy.setAttribute("block_begins_at", at)
+                copy.textContent = getBlockDisplay(copy)
+                // makeBlockDraggable(copy)
+
+                blocks.appendChild(copy)
+            }
+            outputData()
+        }
+
+        let templateBlocks = {
+
         }
 
         for (let i = 0; i <= 6; i++) {
-            let mask = [24, 23, 22, 21, 20, 19, 18][i] 
-            let num_class_c = 2 ** (24 - mask)
+            let mask = [24, 23, 22, 21, 20, 19, 18][i]
+            let num_blocks = 2 ** (24 - mask)
 
             let square = document.createElement("div")
             square.classList = `square sq${mask} unselectable`
 
-            square.innerHTML = `/${mask}`
+            square.textContent = blockSizeMapping[blockSizeSelect.value][mask]
             table.appendChild(square)
 
+            templateBlocks[mask] = square
+
             square.onclick = function (e) {
-                let copy = square.cloneNode(true)
-                let at = nextFit(num_class_c)
+                let availableFits = blockFits(num_blocks)
+                console.log("available fits:", availableFits)
 
-                if (at !== false) {
-                    insertBlock(num_class_c, at)
-                    copy.style.left = (at % 16) * 50 + "px"
-                    copy.style.top = Math.floor(at / 16) * 50 + "px"
-                    copy.setAttribute("block_begins_at", at)
+                if (availableFits.length !== 0) {
+                    let at = availableFits[0]
+                    subnets[at.toString()] = { mask: mask, description: "n/a" }
 
-                    blocks.appendChild(copy)
-                }
+                    renderBlocks()
+                } else
+                    alert("No free space found!")
+            }
+        }
+
+        function makeBlockDraggable(block) {
+            var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0
+
+            let offsetTop = null
+            let offsetLeft = null
+
+            block.onmousedown = dragMouseDown
+
+            function dragMouseDown(e) {
+                offsetTop = block.offsetTop
+                offsetLeft = block.offsetLeft
+                e = e || window.event;
+                e.preventDefault();
+                // get the mouse cursor position at startup:
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                // call a function whenever the cursor moves:
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                // calculate the new cursor position:
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                // set the element's new position:
+                offsetTop = (offsetTop - pos2);
+                offsetLeft = (offsetLeft - pos1);
+                block.style.top = Math.floor(offsetTop / 50 + 0.5) * 50 + "px"
+                block.style.left = Math.floor(offsetLeft / 50 + 0.5) * 50 + "px"
+            }
+
+            function closeDragElement() {
+                // stop moving when mouse button is released:
+                document.onmouseup = null;
+                document.onmousemove = null;
             }
         }
 
@@ -318,6 +662,54 @@
                 addr.style.left = x * 50 + " px"
                 grid.appendChild(addr)
             }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Shift") {
+                let blocks = document.getElementById("blocks").children
+                for (let b of blocks) {
+                    b.classList.toggle("cursorRemove")
+                    b.classList.toggle("cursorDrag")
+                }
+            }
+        })
+        document.addEventListener('keyup', (e) => {
+            if (e.key === "Shift") {
+                let blocks = document.getElementById("blocks").children
+                for (let b of blocks) {
+                    b.classList.toggle("cursorRemove")
+                    b.classList.toggle("cursorDrag")
+                }
+            }
+        })
+
+        function isClassC() {
+            return blockSizeSelect.value === "/24"
+        }
+
+        function changeNetwork() {
+            networkMask.innerText = isClassC() ? "/16" : "/24"
+            network = networkInput.value
+            networkBaseString = network.split(".").slice(0, isClassC() ? 2 : 3).join(".") + "."
+            outputData()
+        }
+
+        changeNetwork()
+
+        function changeBlockSize() {
+            for (let cidr of [24, 23, 22, 21, 20, 19, 18]) {
+                let blocks = document.getElementsByClassName("sq" + cidr)
+                for (let blk of blocks) {
+                    blk.textContent = getSlashNotation(cidr)
+                }
+            }
+
+            for (let blk of blocks.childNodes) {
+                blk.innerText = getBlockDisplay(blk)
+            }
+
+            changeNetwork()
+            outputData()
+        }
     </script>
 
 </body>
