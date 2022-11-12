@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Subnet Planner</title>
-    <style id="style">
+    <style>
         .edge {
             background-color: blue;
             position: absolute;
@@ -64,6 +64,12 @@
             background-position: -0.5px -0.5px;
             box-shadow: 0px 0px 5px 3px white;
             border-radius: 10px;
+        }
+
+        #blocks {
+            top: 0;
+            left: 0;
+            position: absolute;
         }
 
         .square {
@@ -316,11 +322,130 @@
             color: white;
             border-radius: 10px;
         }
+
+        #displaywhich {
+            float: right;
+            margin-left: 50px;
+            margin-top: 5px;
+            position: relative;
+        }
+
+        #buttons {
+            float: right;
+            margin-top: -16px;
+        }
+
+        #container {
+            margin: 20px;
+            margin-left: 0;
+            margin-top: 50px;
+            width: 1250px;
+            height: 800px;
+        }
+
+        #settings {
+            float: left;
+            width: 1250px;
+            margin-bottom: 10px;
+        }
+
+
+        @media only screen and (max-width: 1300px) {
+            #container {
+                width: 800px;
+            }
+
+            #displaywhich {
+                float: none;
+                width: 400px;
+                margin-top: 20px;
+            }
+
+            #buttons {
+                float: right;
+                margin-left: 0;
+                margin-right: auto;
+                margin-top: -75px;
+            }
+
+            #table {
+                float: none;
+                margin-left: 0;
+                width: 800px;
+                height: 400px;
+                margin-bottom: 25px;
+            }
+
+            #table .sq23 {
+                left: 66.66px;
+                width: 100px;
+            }
+
+            #table .sq22 {
+                left: 183.33px;
+                width: 200px;
+            }
+
+            #table .sq21 {
+                top: 0;
+                left: 400px
+            }
+
+            #table .sq20 {
+                top: 50px;
+                width: 800px;
+                height: 50px;
+                line-height: 50px;
+            }
+
+            #table .sq19 {
+                top: 100px;
+                width: 800px;
+                height: 100px;
+                line-height: 100px;
+            }
+
+            #table .sq18 {
+                top: 200px;
+                width: 800px;
+                height: 200px;
+                line-height: 200px;
+            }
+
+            #canvas {
+                float: none;
+                width: 800px;
+            }
+
+            #grid {
+                float: none;
+            }
+
+            #datatextfield {
+                width: 99%;
+                max-width: 800px;
+            }
+
+            #displaywhich {
+                margin-left: 0;
+            }
+
+            #settings {
+                width: 800px;
+                margin-bottom: 0;
+            }
+
+            #buttons {
+                float: right;
+                margin-top: 10px;
+                margin-left: 100px;
+            }
+        }
     </style>
 </head>
 
 <body>
-    <div style="margin-left: 50px;">
+    <div style="margin-left: 50px; padding-right:50px; width: 800px;">
         <h1>Subnet Planner</h1>
         <form>
             <label for="scaleselect"><strong style="font-size: large">One Block is:</strong></label>
@@ -335,17 +460,16 @@
             <input name="networkinput" id="networkinput"
                 style="width: 150px; background-color: #0007; color: white; border-radius: 10px;" value="10.0.0.0"
                 onchange="changeNetwork()">
-            </input>
             <span id="networkmask">
                 /16
             </span>
         </form>
-        <div style="margin: 20px; margin-left: 0; margin-top: 50px;">
+        <div id="container">
             <div id="canvas">
                 <div id="grid"></div>
                 <div id="table"></div>
                 <div id="blocks"></div>
-                <form style="position: relative; margin-left: 10px; margin-right: 500px; margin-bottom: 10px;">
+                <form id="settings">
                     <label for="formatselect">
                         <h2 style="display: inline;">
                             Input/ Output Data as:
@@ -357,19 +481,7 @@
                         <!-- <option value="csv">CSV</option> -->
                         <!-- <option value="scsv">SCSV</option> -->
                     </select>
-                    <div style="float:right; margin-right: -250px; margin-top: -6px; position:relative">
-                        <h3 style="display: inline; margin-top: 10px;">
-                            Display: Mask
-                        </h3>
-                        <label class="switch">
-                            <input type="checkbox" id="displaywhichtoggle" onchange="changeDisplayWhich()">
-                            <span class="slider round"></span>
-                        </label>
-                        <h3 style="display: inline; margin-top: 10px;">
-                            Description
-                        </h3>
-                    </div>
-                    <div id="buttons" style="margin-left: 70px; margin-top: -24px; margin-right:-575px">
+                    <div id="buttons">
                         <div id="addrvis" onclick="toggleAddrVisibility()">
                             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="48" fill="currentColor"
                                 class="bi bi-123 framed" viewBox="0 0 16 16">
@@ -385,6 +497,18 @@
                             </svg>
                         </div>
                     </div>
+                    <div id="displaywhich">
+                        <h3 style="display: inline; margin-top: 10px;">
+                            Display: Mask
+                        </h3>
+                        <label class="switch">
+                            <input type="checkbox" id="displaywhichtoggle" onchange="changeDisplayWhich()">
+                            <span class="slider round"></span>
+                        </label>
+                        <h3 style="display: inline; margin-top: 10px;">
+                            Description
+                        </h3>
+                    </div>
                     <!--
                     <div id="download" onclick="alert()">
                         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
@@ -399,11 +523,10 @@
                 </form>
                 <textarea oninput="inputData()" id="datatextfield"></textarea>
             </div>
-
         </div>
-    </div>
+    </div> 
 
-    <script>
+    <script type="text/javascript">
         let canvas = document.getElementById("canvas")
         let blocks = document.getElementById("blocks")
         let grid = document.getElementById("grid")
@@ -448,10 +571,14 @@
                 if (format === "json") {
                     let output = {}
                     let data = JSON.parse(dataTextField.value)
-                    console.log(data)
                     for (let [k, v] of Object.entries(data)) {
-                        output[parseInt(k.split(".")[isClassC() ? 2 : 3])] = {
-                            mask: parseInt(v.mask.slice(1,)),
+                        let mask = parseInt(v.mask.slice(1,)) - (isClassC() ? 0 : 8)
+                        let addr = parseInt(k.split(".")[isClassC() ? 2 : 3])
+                        if (addr % 2 ** (24 - mask)) {
+                            throw "Invalid address for mask"
+                        }
+                        output[addr] = {
+                            mask: mask,
                             description: v.description
                         }
                     }
@@ -576,7 +703,6 @@
 
                 blocks.appendChild(copy)
             }
-            outputData()
         }
 
         let templateBlocks = {
@@ -604,6 +730,7 @@
                     subnets[at.toString()] = { mask: mask, description: "n/a" }
 
                     renderBlocks()
+                    outputData()
                 } else
                     alert("No free space found!")
             }
@@ -709,9 +836,8 @@
 
             changeNetwork()
             outputData()
-        }
+        }        
     </script>
-
 </body>
 
 </html>

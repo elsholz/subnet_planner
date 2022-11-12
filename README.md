@@ -10,6 +10,11 @@ This is how it looks rn:
 
 ![Screenshot 🚀](./scrot.jpg)
 
+## How to run
+
+The subnet planner doesn't require any installation, you just need to open `html/index.html` in your browser.
+The file consists only of HTML, CSS and vanilla JavaScript.
+
 ## Data Input/ Output
 
 Currently only data input and output in the `JSON` file format is supported.
